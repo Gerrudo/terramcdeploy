@@ -1,0 +1,41 @@
+{
+  "builders": [{
+    "type": "azure-arm",
+
+    "client_id": "b1bc9a8d-68a2-497e-b692-5dcda0b2a122",
+    "client_secret": "4970957b-cd4f-4fed-9715-969b0ddbb209",
+    "tenant_id": "f799a52f-2527-4b60-a975-b059b6f0581f",
+    "subscription_id": "b730f7fe-8b65-4c4e-b634-163cf1548d77",
+
+    "managed_image_resource_group_name": "deploymenttesting_rg",
+    "managed_image_name": "linuxnode_img",
+
+    "os_type": "Linux",
+    "image_publisher": "Canonical",
+    "image_offer": "UbuntuServer",
+    "image_sku": "18.04-LTS",
+
+    "azure_tags": {
+        "dept": "DevOps",
+        "task": "Image deployment"
+    },
+
+    "location": "UK South",
+    "vm_size": "Standard_B2s"
+  }],
+  "provisioners": [{
+    "execute_command": "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh '{{ .Path }}'",
+    "inline": [
+      "apt-get update",
+      "apt-get upgrade -y",
+      "apt-get install docker.io",
+      "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash",
+      "sudo curl -L https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose",
+      "sudo chmod +x /usr/local/bin/docker-compose",
+      
+      "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+    ],
+    "inline_shebang": "/bin/sh -x",
+    "type": "shell"
+  }]
+}
